@@ -4,7 +4,7 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// Force APP_DEBUG=true at system level
+// Force APP_DEBUG=true in system environment before Laravel boots
 $_ENV['APP_DEBUG'] = 'true';
 $_SERVER['APP_DEBUG'] = 'true';
 putenv('APP_DEBUG=true');
@@ -59,13 +59,8 @@ try {
         throw new \Exception("Vendor autoloader not found at {$autoloader}!");
     }
 
-    // Bootstrap Laravel
+    // Bootstrap Laravel and handle request (Laravel 11/12)
     $app = require_once __DIR__ . '/../bootstrap/app.php';
-
-    // Force Laravel config app.debug to true
-    if (function_exists('config')) {
-        config(['app.debug' => true]);
-    }
 
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
