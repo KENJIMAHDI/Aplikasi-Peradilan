@@ -1,6 +1,6 @@
 <?php
 
-// Buat direktori temporary yang dibutuhkan Laravel di Vercel
+// Fix Vercel Serverless Read-Only Storage
 $storageFolders = [
     '/tmp/storage/app/public',
     '/tmp/storage/framework/views',
@@ -15,8 +15,11 @@ foreach ($storageFolders as $folder) {
     }
 }
 
-// Bind custom storage path
+// Override Storage & Cache Paths to /tmp
 $_ENV['APP_STORAGE_PATH'] = '/tmp/storage';
+$_ENV['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
+$_ENV['CACHE_STORE'] = 'array';
+$_ENV['SESSION_DRIVER'] = 'cookie';
 
-// Require index.php bawaan Laravel
+// Forward request to Laravel
 require __DIR__ . '/../public/index.php';
