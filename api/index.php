@@ -9,30 +9,24 @@ $_ENV['APP_DEBUG'] = 'true';
 $_SERVER['APP_DEBUG'] = 'true';
 putenv('APP_DEBUG=true');
 
-// Ensure essential drivers are never empty string "" in serverless env
-$sessionDriver = !empty($_ENV['SESSION_DRIVER']) ? $_ENV['SESSION_DRIVER'] : 'cookie';
-$cacheStore    = !empty($_ENV['CACHE_STORE'])    ? $_ENV['CACHE_STORE']    : 'array';
-$filesystemDisk = !empty($_ENV['FILESYSTEM_DISK']) ? $_ENV['FILESYSTEM_DISK'] : 'local';
-$logChannel    = !empty($_ENV['LOG_CHANNEL'])    ? $_ENV['LOG_CHANNEL']    : 'stderr';
-$dbConnection  = !empty($_ENV['DB_CONNECTION'])  ? $_ENV['DB_CONNECTION']  : 'pgsql';
+// Ensure all Laravel driver managers receive valid non-empty driver defaults
+$driverDefaults = [
+    'APP_MAINTENANCE_DRIVER' => 'file',
+    'SESSION_DRIVER'        => 'cookie',
+    'CACHE_STORE'           => 'array',
+    'FILESYSTEM_DISK'       => 'local',
+    'LOG_CHANNEL'           => 'stderr',
+    'DB_CONNECTION'         => 'pgsql',
+    'QUEUE_CONNECTION'       => 'sync',
+    'BROADCAST_CONNECTION'   => 'log',
+];
 
-$_ENV['SESSION_DRIVER'] = $sessionDriver;
-$_ENV['CACHE_STORE'] = $cacheStore;
-$_ENV['FILESYSTEM_DISK'] = $filesystemDisk;
-$_ENV['LOG_CHANNEL'] = $logChannel;
-$_ENV['DB_CONNECTION'] = $dbConnection;
-
-$_SERVER['SESSION_DRIVER'] = $sessionDriver;
-$_SERVER['CACHE_STORE'] = $cacheStore;
-$_SERVER['FILESYSTEM_DISK'] = $filesystemDisk;
-$_SERVER['LOG_CHANNEL'] = $logChannel;
-$_SERVER['DB_CONNECTION'] = $dbConnection;
-
-putenv("SESSION_DRIVER={$sessionDriver}");
-putenv("CACHE_STORE={$cacheStore}");
-putenv("FILESYSTEM_DISK={$filesystemDisk}");
-putenv("LOG_CHANNEL={$logChannel}");
-putenv("DB_CONNECTION={$dbConnection}");
+foreach ($driverDefaults as $key => $fallback) {
+    $val = (!empty($_ENV[$key]) && trim($_ENV[$key]) !== '') ? $_ENV[$key] : $fallback;
+    $_ENV[$key] = $val;
+    $_SERVER[$key] = $val;
+    putenv("{$key}={$val}");
+}
 
 use Illuminate\Http\Request;
 
