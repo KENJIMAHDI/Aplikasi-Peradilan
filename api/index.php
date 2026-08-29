@@ -11,6 +11,15 @@ $_SERVER['HTTPS'] = 'on';
 putenv('APP_DEBUG=true');
 putenv('HTTPS=on');
 
+// Ensure BCRYPT_ROUNDS is valid integer between 4 and 31 (default 12) to prevent password_hash ValueError
+$bcryptRounds = (!empty($_ENV['BCRYPT_ROUNDS']) && is_numeric($_ENV['BCRYPT_ROUNDS']) && (int)$_ENV['BCRYPT_ROUNDS'] >= 4 && (int)$_ENV['BCRYPT_ROUNDS'] <= 31)
+    ? (int)$_ENV['BCRYPT_ROUNDS']
+    : 12;
+
+$_ENV['BCRYPT_ROUNDS'] = $bcryptRounds;
+$_SERVER['BCRYPT_ROUNDS'] = $bcryptRounds;
+putenv("BCRYPT_ROUNDS={$bcryptRounds}");
+
 // Ensure all Laravel driver managers receive valid non-empty driver defaults
 $driverDefaults = [
     'APP_MAINTENANCE_DRIVER' => 'file',
@@ -21,6 +30,7 @@ $driverDefaults = [
     'DB_CONNECTION'         => 'pgsql',
     'QUEUE_CONNECTION'       => 'sync',
     'BROADCAST_CONNECTION'   => 'log',
+    'HASH_DRIVER'           => 'bcrypt',
 ];
 
 foreach ($driverDefaults as $key => $fallback) {
