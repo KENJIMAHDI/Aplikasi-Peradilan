@@ -1,26 +1,35 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+use Illuminate\Http\Request;
 
-// Arahkan storage & cache Laravel ke folder temporary /tmp
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+define('LARAVEL_START', microtime(true));
 
-$app->useStoragePath('/tmp/storage');
+// Setup writable /tmp storage directories for Vercel serverless environment
+$tmpStorage = '/tmp/storage';
+$dirs = [
+    $tmpStorage . '/app/public',
+    $tmpStorage . '/framework/views',
+    $tmpStorage . '/framework/cache/data',
+    $tmpStorage . '/framework/sessions',
+    $tmpStorage . '/logs',
+    '/tmp/bootstrap/cache'
+];
 
-// Otomatis buat folder temporary jika belum ada
-$dirs = ['/tmp/storage/framework/views', '/tmp/storage/framework/cache', '/tmp/storage/framework/sessions', '/tmp/storage/logs'];
 foreach ($dirs as $dir) {
-    if (!file_exists($dir)) {
+    if (!is_dir($dir)) {
         @mkdir($dir, 0777, true);
     }
 }
 
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+// Override storage & compiled view paths for serverless
+$_ENV['APP_STORAGE_PATH'] = $tmpStorage;
+putenv("APP_STORAGE_PATH={$tmpStorage}");
+putenv("VIEW_COMPILED_PATH={$tmpStorage}/framework/views");
 
-$response = $kernel->handle(
-    $request = Illuminate\Http\Request::capture()
-);
+// Register Composer autoloader
+require __DIR__ . '/../vendor/autoload.php';
 
-$response->send();
+// Bootstrap Laravel and handle request (Compatible with Laravel 11/12)
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 
-$kernel->terminate($request, $response);
+$app->handleRequest(Request::capture());
