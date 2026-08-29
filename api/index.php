@@ -66,9 +66,6 @@ try {
     // 4. Bootstrap Laravel Application
     $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-    // Force writable compiled views path in config repository
-    $app->make('config')->set('view.compiled', $compiledViews);
-
     // 5. Handle incoming HTTP Request
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {

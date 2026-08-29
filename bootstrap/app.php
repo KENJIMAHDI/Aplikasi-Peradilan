@@ -35,8 +35,5 @@ $app = Application::configure(basePath: dirname(__DIR__))
 if (isset($_ENV['APP_STORAGE_PATH'])) {
     $app->useStoragePath($_ENV['APP_STORAGE_PATH']);
 }
-if (isset($_ENV['VIEW_COMPILED_PATH'])) {
-    $app->make('config')->set('view.compiled', $_ENV['VIEW_COMPILED_PATH']);
-}
 
 return $app;
