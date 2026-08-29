@@ -31,7 +31,14 @@ try {
         }
     }
 
-    // 2. Set environment defaults & HTTPS scheme
+    // 2. Clear any stale bootstrap cache files
+    @unlink(__DIR__ . '/../bootstrap/cache/packages.php');
+    @unlink(__DIR__ . '/../bootstrap/cache/services.php');
+    @unlink(__DIR__ . '/../bootstrap/cache/config.php');
+    @unlink(__DIR__ . '/../bootstrap/cache/routes.php');
+    @unlink(__DIR__ . '/../bootstrap/cache/events.php');
+
+    // 3. Set environment defaults & HTTPS scheme
     $_SERVER['HTTPS'] = 'on';
     putenv('HTTPS=on');
 
@@ -55,7 +62,7 @@ try {
         putenv("{$key}={$val}");
     }
 
-    // 3. Register Composer Autoloader
+    // 4. Register Composer Autoloader
     $autoloader = __DIR__ . '/../vendor/autoload.php';
     if (file_exists($autoloader)) {
         require $autoloader;
@@ -63,10 +70,10 @@ try {
         throw new \Exception("Vendor autoloader not found at {$autoloader}!");
     }
 
-    // 4. Bootstrap Laravel Application
+    // 5. Bootstrap Laravel Application
     $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-    // 5. Handle incoming HTTP Request
+    // 6. Handle incoming HTTP Request
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
     http_response_code(200);
