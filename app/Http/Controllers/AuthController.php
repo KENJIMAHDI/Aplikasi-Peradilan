@@ -21,7 +21,10 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials)) {
+        $user = User::where('email', $credentials['email'])->first();
+
+        if ($user && password_verify($credentials['password'], $user->password)) {
+            Auth::login($user);
             $request->session()->regenerate();
             return redirect()->route('dashboard');
         }
@@ -47,7 +50,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'password' => password_hash($validated['password'], PASSWORD_DEFAULT),
         ]);
 
         Auth::login($user);
