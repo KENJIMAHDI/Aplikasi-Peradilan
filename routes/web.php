@@ -11,6 +11,33 @@ use App\Http\Controllers\PerdataController;
 use App\Http\Controllers\PidanaController;
 use App\Http\Controllers\KalkulatorController;
 
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/run-migrations-secret', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        $output1 = Artisan::output();
+
+        Artisan::call('db:seed', ['--force' => true]);
+        $output2 = Artisan::output();
+
+        return response("<div style='font-family:sans-serif; padding:20px; background:#e6fffa; border:2px solid #319795; border-radius:10px; margin:20px;'>
+            <h2 style='color:#2c7a7b; margin-top:0;'>✅ Migration & Seeding Berhasil ke Supabase!</h2>
+            <h3>Migration Output:</h3>
+            <pre style='background:#1a202c; color:#68d391; padding:15px; border-radius:6px; overflow:auto; font-size:13px;'>{$output1}</pre>
+            <h3>Seed Output:</h3>
+            <pre style='background:#1a202c; color:#68d391; padding:15px; border-radius:6px; overflow:auto; font-size:13px;'>{$output2}</pre>
+            <p><a href='/login' style='display:inline-block; padding:10px 20px; background:#319795; color:white; border-radius:6px; text-decoration:none; font-weight:bold;'>👉 Buka Halaman Login Aplikasi</a></p>
+        </div>");
+    } catch (\Throwable $e) {
+        return response("<div style='font-family:sans-serif; padding:20px; background:#fff0f0; border:2px solid #e53e3e; border-radius:10px; margin:20px;'>
+            <h2 style='color:#c53030; margin-top:0;'>❌ Migration Error:</h2>
+            <p><strong>Message:</strong> {$e->getMessage()}</p>
+            <pre style='background:#1a202c; color:#fc8181; padding:15px; border-radius:6px; overflow:auto; font-size:13px;'>{$e->getTraceAsString()}</pre>
+        </div>", 500);
+    }
+});
+
 Route::get('/', function () {
     return redirect()->route('login');
 });
