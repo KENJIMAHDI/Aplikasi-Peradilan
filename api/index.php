@@ -1,25 +1,26 @@
 <?php
 
-// Fix Vercel Serverless Read-Only Storage
-$storageFolders = [
-    '/tmp/storage/app/public',
-    '/tmp/storage/framework/views',
-    '/tmp/storage/framework/cache/data',
-    '/tmp/storage/framework/sessions',
-    '/tmp/storage/logs',
-];
+require __DIR__ . '/../vendor/autoload.php';
 
-foreach ($storageFolders as $folder) {
-    if (!is_dir($folder)) {
-        @mkdir($folder, 0777, true);
+// Arahkan storage & cache Laravel ke folder temporary /tmp
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+
+$app->useStoragePath('/tmp/storage');
+
+// Otomatis buat folder temporary jika belum ada
+$dirs = ['/tmp/storage/framework/views', '/tmp/storage/framework/cache', '/tmp/storage/framework/sessions', '/tmp/storage/logs'];
+foreach ($dirs as $dir) {
+    if (!file_exists($dir)) {
+        @mkdir($dir, 0777, true);
     }
 }
 
-// Override Storage & Cache Paths to /tmp
-$_ENV['APP_STORAGE_PATH'] = '/tmp/storage';
-$_ENV['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
-$_ENV['CACHE_STORE'] = 'array';
-$_ENV['SESSION_DRIVER'] = 'cookie';
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
-// Forward request to Laravel
-require __DIR__ . '/../public/index.php';
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
+
+$response->send();
+
+$kernel->terminate($request, $response);
