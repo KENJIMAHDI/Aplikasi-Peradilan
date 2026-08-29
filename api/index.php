@@ -21,9 +21,10 @@ $_SERVER['BCRYPT_ROUNDS'] = $bcryptRounds;
 putenv("BCRYPT_ROUNDS={$bcryptRounds}");
 
 // Ensure all Laravel driver managers receive valid non-empty driver defaults
+// SESSION_DRIVER=database allows persistent sessions via Supabase sessions table
 $driverDefaults = [
     'APP_MAINTENANCE_DRIVER' => 'file',
-    'SESSION_DRIVER'        => 'cookie',
+    'SESSION_DRIVER'        => 'database',
     'CACHE_STORE'           => 'array',
     'FILESYSTEM_DISK'       => 'local',
     'LOG_CHANNEL'           => 'stderr',
