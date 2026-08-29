@@ -6,6 +6,18 @@ error_reporting(E_ALL);
 
 use Illuminate\Http\Request;
 
+if (isset($_GET['debug_env']) || $_SERVER['REQUEST_URI'] === '/debug-env') {
+    http_response_code(200);
+    echo "<div style='font-family:sans-serif; padding:20px; background:#edf2f7; border:2px solid #4a5568; border-radius:10px; margin:20px;'>";
+    echo "<h2>🔍 Diagnosa PHP Server Vercel</h2>";
+    echo "<p><strong>Versi PHP:</strong> " . phpversion() . "</p>";
+    echo "<p><strong>PDO Drivers Terinstall:</strong> <span style='color:blue; font-weight:bold;'>" . implode(', ', PDO::getAvailableDrivers()) . "</span></p>";
+    echo "<p><strong>Extension Terpasang:</strong></p>";
+    echo "<pre style='background:#1a202c; color:#e2e8f0; padding:10px; border-radius:5px; max-height:200px; overflow:auto;'>" . implode("\n", getloaded_extensions()) . "</pre>";
+    echo "</div>";
+    exit;
+}
+
 try {
     if (!defined('LARAVEL_START')) {
         define('LARAVEL_START', microtime(true));
