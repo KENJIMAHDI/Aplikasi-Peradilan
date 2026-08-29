@@ -71,10 +71,17 @@ try {
 } catch (\Throwable $e) {
     http_response_code(200);
     echo "<div style='font-family:sans-serif; padding:20px; background:#fff0f0; border:2px solid #e53e3e; border-radius:10px; margin:20px;'>";
-    echo "<h2 style='color:#c53030; margin-top:0;'>⚠️ Detail Error Laravel di Vercel:</h2>";
+    echo "<h2 style='color:#c53030; margin-top:0;'>⚠️ Detail Error di Vercel:</h2>";
     echo "<p style='font-size:16px;'><strong>Pesan Error:</strong> <span style='color:#9b2c2c;'>" . htmlspecialchars($e->getMessage()) . "</span></p>";
     echo "<p><strong>Lokasi File:</strong> <code>" . htmlspecialchars($e->getFile()) . "</code> (Baris " . $e->getLine() . ")</p>";
+    
+    if ($prev = $e->getPrevious()) {
+        echo "<h3 style='color:#c53030;'>Penyebab Utama (Previous Error):</h3>";
+        echo "<p style='font-size:16px;'><strong>Pesan:</strong> <span style='color:#9b2c2c;'>" . htmlspecialchars($prev->getMessage()) . "</span></p>";
+        echo "<pre style='background:#1a202c; color:#fc8181; padding:15px; border-radius:6px; overflow:auto; max-height:250px; font-size:13px;'>" . htmlspecialchars($prev->getTraceAsString()) . "</pre>";
+    }
+
     echo "<h3>Stack Trace:</h3>";
-    echo "<pre style='background:#1a202c; color:#68d391; padding:15px; border-radius:6px; overflow:auto; max-height:450px; font-size:13px;'>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+    echo "<pre style='background:#1a202c; color:#68d391; padding:15px; border-radius:6px; overflow:auto; max-height:350px; font-size:13px;'>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
     echo "</div>";
 }
