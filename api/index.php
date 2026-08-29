@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 try {
     // 1. Setup writable storage & compiled view paths for Vercel Serverless
     $storagePath = '/tmp/storage';
+    $bootstrapPath = '/tmp/bootstrap';
     $compiledViews = '/tmp/storage/framework/views';
 
     $_ENV['APP_STORAGE_PATH'] = $storagePath;
@@ -23,6 +24,7 @@ try {
         $storagePath . '/framework/cache/data',
         $storagePath . '/framework/sessions',
         $storagePath . '/logs',
+        $bootstrapPath . '/cache',
     ];
 
     foreach ($dirs as $dir) {
@@ -31,18 +33,10 @@ try {
         }
     }
 
-    // 2. Clear any stale bootstrap cache files
-    @unlink(__DIR__ . '/../bootstrap/cache/packages.php');
-    @unlink(__DIR__ . '/../bootstrap/cache/services.php');
-    @unlink(__DIR__ . '/../bootstrap/cache/config.php');
-    @unlink(__DIR__ . '/../bootstrap/cache/routes.php');
-    @unlink(__DIR__ . '/../bootstrap/cache/events.php');
-
-    // 3. Set environment defaults & HTTPS scheme
+    // 2. Set environment defaults & HTTPS scheme
     $_SERVER['HTTPS'] = 'on';
     putenv('HTTPS=on');
 
-    // Ensure all Laravel driver managers receive valid non-empty driver defaults
     $driverDefaults = [
         'APP_MAINTENANCE_DRIVER' => 'file',
         'SESSION_DRIVER'        => 'cookie',
@@ -62,7 +56,7 @@ try {
         putenv("{$key}={$val}");
     }
 
-    // 4. Register Composer Autoloader
+    // 3. Register Composer Autoloader
     $autoloader = __DIR__ . '/../vendor/autoload.php';
     if (file_exists($autoloader)) {
         require $autoloader;
@@ -70,8 +64,12 @@ try {
         throw new \Exception("Vendor autoloader not found at {$autoloader}!");
     }
 
-    // 5. Bootstrap Laravel Application
+    // 4. Bootstrap Laravel Application
     $app = require_once __DIR__ . '/../bootstrap/app.php';
+
+    // 5. MENGALALIHKAN BOOTSTRAP CACHE KE /tmp (SOLUSI VITAL)
+    // Ini memastikan Laravel tidak membaca file cache cacat dari proses build Vercel
+    $app->useBootstrapPath($bootstrapPath);
 
     // 6. Handle incoming HTTP Request (LARAVEL 11 WAY)
     $app->handleRequest(Request::capture());
