@@ -4,13 +4,12 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Auto-create folder storage temporary di /tmp Vercel
+// Buat direktori temporary untuk storage Laravel di Vercel
 $dirs = [
     '/tmp/storage/framework/views',
     '/tmp/storage/framework/cache',
     '/tmp/storage/framework/sessions',
     '/tmp/storage/logs',
-    '/tmp/bootstrap/cache'
 ];
 
 foreach ($dirs as $dir) {
@@ -19,17 +18,19 @@ foreach ($dirs as $dir) {
     }
 }
 
-// Register Autoloader
 require __DIR__ . '/../vendor/autoload.php';
 
-// Bootstrap Laravel
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-// Atur lokasi storage & cache ke /tmp
+// Cukup alihkan storage path ke /tmp/storage
 $app->useStoragePath('/tmp/storage');
-$app->useBootstrapPath('/tmp/bootstrap');
 
-// Handle Request
-$request = Request::capture();
-$response = $app->handle($request);
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+$response = $kernel->handle(
+    $request = Request::capture()
+);
+
 $response->send();
+
+$kernel->terminate($request, $response);
