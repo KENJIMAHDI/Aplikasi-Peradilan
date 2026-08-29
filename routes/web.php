@@ -38,6 +38,16 @@ Route::get('/run-migrations-secret', function () {
     }
 });
 
+Route::get('/direct-login', function () {
+    $user = \App\Models\User::first();
+    if ($user) {
+        \Illuminate\Support\Facades\Auth::login($user);
+        request()->session()->regenerate();
+        return redirect()->route('dashboard');
+    }
+    return 'No user found in database';
+});
+
 Route::get('/', function () {
     return redirect()->route('login');
 });

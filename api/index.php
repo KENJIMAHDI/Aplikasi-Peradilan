@@ -11,6 +11,11 @@ $_SERVER['HTTPS'] = 'on';
 putenv('APP_DEBUG=true');
 putenv('HTTPS=on');
 
+// Force SESSION_DRIVER to database unconditionally for Vercel serverless
+$_ENV['SESSION_DRIVER'] = 'database';
+$_SERVER['SESSION_DRIVER'] = 'database';
+putenv('SESSION_DRIVER=database');
+
 // Ensure BCRYPT_ROUNDS is valid integer between 4 and 31 (default 12) to prevent password_hash ValueError
 $bcryptRounds = (!empty($_ENV['BCRYPT_ROUNDS']) && is_numeric($_ENV['BCRYPT_ROUNDS']) && (int)$_ENV['BCRYPT_ROUNDS'] >= 4 && (int)$_ENV['BCRYPT_ROUNDS'] <= 31)
     ? (int)$_ENV['BCRYPT_ROUNDS']
@@ -21,10 +26,8 @@ $_SERVER['BCRYPT_ROUNDS'] = $bcryptRounds;
 putenv("BCRYPT_ROUNDS={$bcryptRounds}");
 
 // Ensure all Laravel driver managers receive valid non-empty driver defaults
-// SESSION_DRIVER=database allows persistent sessions via Supabase sessions table
 $driverDefaults = [
     'APP_MAINTENANCE_DRIVER' => 'file',
-    'SESSION_DRIVER'        => 'database',
     'CACHE_STORE'           => 'array',
     'FILESYSTEM_DISK'       => 'local',
     'LOG_CHANNEL'           => 'stderr',
