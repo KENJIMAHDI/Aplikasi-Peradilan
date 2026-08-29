@@ -4,19 +4,12 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-use Illuminate\Http\Request;
+// Force APP_DEBUG=true at system level
+$_ENV['APP_DEBUG'] = 'true';
+$_SERVER['APP_DEBUG'] = 'true';
+putenv('APP_DEBUG=true');
 
-if (isset($_GET['debug_env']) || $_SERVER['REQUEST_URI'] === '/debug-env') {
-    http_response_code(200);
-    echo "<div style='font-family:sans-serif; padding:20px; background:#edf2f7; border:2px solid #4a5568; border-radius:10px; margin:20px;'>";
-    echo "<h2>🔍 Diagnosa PHP Server Vercel</h2>";
-    echo "<p><strong>Versi PHP:</strong> " . phpversion() . "</p>";
-    echo "<p><strong>PDO Drivers Terinstall:</strong> <span style='color:blue; font-weight:bold;'>" . implode(', ', PDO::getAvailableDrivers()) . "</span></p>";
-    echo "<p><strong>Extension Terpasang:</strong></p>";
-    echo "<pre style='background:#1a202c; color:#e2e8f0; padding:10px; border-radius:5px; max-height:200px; overflow:auto;'>" . implode("\n", getloaded_extensions()) . "</pre>";
-    echo "</div>";
-    exit;
-}
+use Illuminate\Http\Request;
 
 try {
     if (!defined('LARAVEL_START')) {
@@ -51,8 +44,6 @@ try {
 
     putenv("APP_STORAGE_PATH={$tmpStorage}");
     putenv("VIEW_COMPILED_PATH={$tmpStorage}/framework/views");
-    putenv("APP_SERVICES_CACHE={$tmpBootstrapCache}/services.php");
-    putenv("APP_PACKAGES_CACHE={$tmpBootstrapCache}/packages.php");
 
     // Remove any stale bootstrap cache files committed from Windows
     @unlink(__DIR__ . '/../bootstrap/cache/packages.php');
@@ -68,8 +59,13 @@ try {
         throw new \Exception("Vendor autoloader not found at {$autoloader}!");
     }
 
-    // Bootstrap Laravel and handle request
+    // Bootstrap Laravel
     $app = require_once __DIR__ . '/../bootstrap/app.php';
+
+    // Force Laravel config app.debug to true
+    if (function_exists('config')) {
+        config(['app.debug' => true]);
+    }
 
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
