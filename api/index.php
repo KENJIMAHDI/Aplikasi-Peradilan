@@ -13,13 +13,14 @@ try {
 
     // Setup writable /tmp storage directories for Vercel serverless environment
     $tmpStorage = '/tmp/storage';
+    $tmpBootstrapCache = '/tmp/bootstrap/cache';
     $dirs = [
         $tmpStorage . '/app/public',
         $tmpStorage . '/framework/views',
         $tmpStorage . '/framework/cache/data',
         $tmpStorage . '/framework/sessions',
         $tmpStorage . '/logs',
-        '/tmp/bootstrap/cache'
+        $tmpBootstrapCache
     ];
 
     foreach ($dirs as $dir) {
@@ -28,17 +29,31 @@ try {
         }
     }
 
-    // Override storage & compiled view paths for serverless
+    // Override storage & cache paths for serverless environment
     $_ENV['APP_STORAGE_PATH'] = $tmpStorage;
+    $_ENV['APP_SERVICES_CACHE'] = $tmpBootstrapCache . '/services.php';
+    $_ENV['APP_PACKAGES_CACHE'] = $tmpBootstrapCache . '/packages.php';
+    $_ENV['APP_CONFIG_CACHE'] = $tmpBootstrapCache . '/config.php';
+    $_ENV['APP_ROUTES_CACHE'] = $tmpBootstrapCache . '/routes.php';
+    $_ENV['APP_EVENTS_CACHE'] = $tmpBootstrapCache . '/events.php';
+
     putenv("APP_STORAGE_PATH={$tmpStorage}");
     putenv("VIEW_COMPILED_PATH={$tmpStorage}/framework/views");
+    putenv("APP_SERVICES_CACHE={$tmpBootstrapCache}/services.php");
+    putenv("APP_PACKAGES_CACHE={$tmpBootstrapCache}/packages.php");
+
+    // Remove any stale bootstrap cache files committed from Windows
+    @unlink(__DIR__ . '/../bootstrap/cache/packages.php');
+    @unlink(__DIR__ . '/../bootstrap/cache/services.php');
+    @unlink(__DIR__ . '/../bootstrap/cache/config.php');
+    @unlink(__DIR__ . '/../bootstrap/cache/routes.php');
 
     // Register Composer autoloader
     $autoloader = __DIR__ . '/../vendor/autoload.php';
     if (file_exists($autoloader)) {
         require $autoloader;
     } else {
-        throw new \Exception("Vendor autoloader not found at {$autoloader}! Ensure composer packages are committed or built.");
+        throw new \Exception("Vendor autoloader not found at {$autoloader}!");
     }
 
     // Bootstrap Laravel and handle request
@@ -46,7 +61,7 @@ try {
 
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
-    http_response_code(200); // Return 200 so Vercel displays the error details directly on screen
+    http_response_code(200);
     echo "<div style='font-family:sans-serif; padding:20px; background:#fff0f0; border:2px solid #e53e3e; border-radius:10px; margin:20px;'>";
     echo "<h2 style='color:#c53030; margin-top:0;'>⚠️ Detail Error Laravel di Vercel:</h2>";
     echo "<p style='font-size:16px;'><strong>Pesan Error:</strong> <span style='color:#9b2c2c;'>" . htmlspecialchars($e->getMessage()) . "</span></p>";
