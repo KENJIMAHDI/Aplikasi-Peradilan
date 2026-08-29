@@ -9,6 +9,31 @@ $_ENV['APP_DEBUG'] = 'true';
 $_SERVER['APP_DEBUG'] = 'true';
 putenv('APP_DEBUG=true');
 
+// Ensure essential drivers are never empty string "" in serverless env
+$sessionDriver = !empty($_ENV['SESSION_DRIVER']) ? $_ENV['SESSION_DRIVER'] : 'cookie';
+$cacheStore    = !empty($_ENV['CACHE_STORE'])    ? $_ENV['CACHE_STORE']    : 'array';
+$filesystemDisk = !empty($_ENV['FILESYSTEM_DISK']) ? $_ENV['FILESYSTEM_DISK'] : 'local';
+$logChannel    = !empty($_ENV['LOG_CHANNEL'])    ? $_ENV['LOG_CHANNEL']    : 'stderr';
+$dbConnection  = !empty($_ENV['DB_CONNECTION'])  ? $_ENV['DB_CONNECTION']  : 'pgsql';
+
+$_ENV['SESSION_DRIVER'] = $sessionDriver;
+$_ENV['CACHE_STORE'] = $cacheStore;
+$_ENV['FILESYSTEM_DISK'] = $filesystemDisk;
+$_ENV['LOG_CHANNEL'] = $logChannel;
+$_ENV['DB_CONNECTION'] = $dbConnection;
+
+$_SERVER['SESSION_DRIVER'] = $sessionDriver;
+$_SERVER['CACHE_STORE'] = $cacheStore;
+$_SERVER['FILESYSTEM_DISK'] = $filesystemDisk;
+$_SERVER['LOG_CHANNEL'] = $logChannel;
+$_SERVER['DB_CONNECTION'] = $dbConnection;
+
+putenv("SESSION_DRIVER={$sessionDriver}");
+putenv("CACHE_STORE={$cacheStore}");
+putenv("FILESYSTEM_DISK={$filesystemDisk}");
+putenv("LOG_CHANNEL={$logChannel}");
+putenv("DB_CONNECTION={$dbConnection}");
+
 use Illuminate\Http\Request;
 
 try {
@@ -59,7 +84,7 @@ try {
         throw new \Exception("Vendor autoloader not found at {$autoloader}!");
     }
 
-    // Bootstrap Laravel and handle request (Laravel 11/12)
+    // Bootstrap Laravel and handle request
     $app = require_once __DIR__ . '/../bootstrap/app.php';
 
     $app->handleRequest(Request::capture());
