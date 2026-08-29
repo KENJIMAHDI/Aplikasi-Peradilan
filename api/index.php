@@ -7,7 +7,9 @@ error_reporting(E_ALL);
 // Force APP_DEBUG=true in system environment before Laravel boots
 $_ENV['APP_DEBUG'] = 'true';
 $_SERVER['APP_DEBUG'] = 'true';
+$_SERVER['HTTPS'] = 'on';
 putenv('APP_DEBUG=true');
+putenv('HTTPS=on');
 
 // Ensure all Laravel driver managers receive valid non-empty driver defaults
 $driverDefaults = [
