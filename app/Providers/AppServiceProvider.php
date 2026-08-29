@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Support\Facades\Hash::setRounds(10);
+
         if (request()->server('HTTP_X_FORWARDED_PROTO') === 'https' || app()->environment('production') || isset($_SERVER['VERCEL'])) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
