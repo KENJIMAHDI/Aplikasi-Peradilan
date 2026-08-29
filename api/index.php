@@ -1,22 +1,22 @@
 <?php
 
-// Fix Vercel Read-Only Storage Directory
-$storageDirs = [
+// Buat direktori temporary yang dibutuhkan Laravel di Vercel
+$storageFolders = [
+    '/tmp/storage/app/public',
     '/tmp/storage/framework/views',
     '/tmp/storage/framework/cache/data',
     '/tmp/storage/framework/sessions',
-    '/tmp/storage/bootstrap/cache'
+    '/tmp/storage/logs',
 ];
 
-foreach ($storageDirs as $dir) {
-    if (!is_dir($dir)) {
-        @mkdir($dir, 0777, true);
+foreach ($storageFolders as $folder) {
+    if (!is_dir($folder)) {
+        @mkdir($folder, 0777, true);
     }
 }
 
+// Bind custom storage path
 $_ENV['APP_STORAGE_PATH'] = '/tmp/storage';
-putenv('APP_STORAGE_PATH=/tmp/storage');
-putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
 
-// Forward Vercel requests to Laravel
+// Require index.php bawaan Laravel
 require __DIR__ . '/../public/index.php';
