@@ -154,3 +154,14 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('delegasi', App\Http\Controllers\DelegasiController::class)->except(['create', 'show', 'edit']);
     });
 });
+
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+
+Route::get('/fix-password', function () {
+    DB::table('users')
+        ->where('email', 'admin@pengadilan.go.id')
+        ->update(['password' => Hash::make('rahasia123')]);
+
+    return 'Password berhasil direset ke standar Bcrypt Laravel!';
+});
