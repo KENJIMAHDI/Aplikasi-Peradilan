@@ -26,6 +26,7 @@ class AuthController extends Controller
         if ($user && password_verify($credentials['password'], $user->password)) {
             Auth::login($user);
             $request->session()->regenerate();
+            $request->session()->save(); // PAKSA SAVE SESSION SEBELUM REDIRECT (VERCEL FIX)
             return redirect()->route('dashboard');
         }
 
@@ -54,6 +55,7 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+        $request->session()->save(); // PAKSA SAVE SESSION SEBELUM REDIRECT
 
         return redirect()->route('dashboard');
     }
@@ -63,6 +65,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        $request->session()->save(); // PAKSA SAVE SESSION SEBELUM REDIRECT
         return redirect('/login');
     }
 }
