@@ -13,6 +13,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Wajib untuk Vercel agar membaca header HTTPS dengan benar
+        $middleware->trustProxies(at: '*');
         $middleware->statefulApi();
         $middleware->api(append: [
             \App\Http\Middleware\BypassAuth::class,
