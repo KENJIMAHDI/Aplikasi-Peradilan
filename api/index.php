@@ -39,7 +39,7 @@ try {
 
     $driverDefaults = [
         'APP_MAINTENANCE_DRIVER' => 'file',
-        'SESSION_DRIVER'        => 'cookie',
+        'SESSION_DRIVER'        => 'database',
         'CACHE_STORE'           => 'array',
         'FILESYSTEM_DISK'       => 'local',
         'LOG_CHANNEL'           => 'stderr',
@@ -55,6 +55,12 @@ try {
         $_SERVER[$key] = $val;
         putenv("{$key}={$val}");
     }
+
+    // PAKSA SESSION_DRIVER menjadi 'database' apa pun isi Vercel env-nya
+    // Karena Vercel serverless tidak bisa menahan session file/cookie secara stabil
+    $_ENV['SESSION_DRIVER'] = 'database';
+    $_SERVER['SESSION_DRIVER'] = 'database';
+    putenv('SESSION_DRIVER=database');
 
     // 3. Register Composer Autoloader
     $autoloader = __DIR__ . '/../vendor/autoload.php';
