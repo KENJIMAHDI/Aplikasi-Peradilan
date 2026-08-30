@@ -56,11 +56,20 @@ try {
         putenv("{$key}={$val}");
     }
 
-    // PAKSA SESSION_DRIVER menjadi 'database' apa pun isi Vercel env-nya
-    // Karena Vercel serverless tidak bisa menahan session file/cookie secara stabil
-    $_ENV['SESSION_DRIVER'] = 'database';
-    $_SERVER['SESSION_DRIVER'] = 'database';
-    putenv('SESSION_DRIVER=database');
+    // PAKSA SESSION_DRIVER menjadi 'cookie'
+    // Karena Vercel serverless sangat brutal, cookie driver adalah 1.000.000% yang paling aman
+    $_ENV['SESSION_DRIVER'] = 'cookie';
+    $_SERVER['SESSION_DRIVER'] = 'cookie';
+    putenv('SESSION_DRIVER=cookie');
+
+    // PAKSA COOKIE SETTINGS AGAR BROWSER TIDAK MENOLAK SESSION
+    $_ENV['SESSION_DOMAIN'] = null;
+    $_SERVER['SESSION_DOMAIN'] = null;
+    putenv('SESSION_DOMAIN=');
+    
+    $_ENV['SESSION_SECURE_COOKIE'] = true;
+    $_SERVER['SESSION_SECURE_COOKIE'] = true;
+    putenv('SESSION_SECURE_COOKIE=true');
 
     // 3. Register Composer Autoloader
     $autoloader = __DIR__ . '/../vendor/autoload.php';
