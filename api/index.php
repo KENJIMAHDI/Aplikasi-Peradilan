@@ -56,11 +56,11 @@ try {
         putenv("{$key}={$val}");
     }
 
-    // PAKSA SESSION_DRIVER menjadi 'database'
-    // Menggunakan 'cookie' menyebabkan 494 REQUEST_HEADER_TOO_LARGE jika menumpuk
-    $_ENV['SESSION_DRIVER'] = 'database';
-    $_SERVER['SESSION_DRIVER'] = 'database';
-    putenv('SESSION_DRIVER=database');
+    // PAKSA SESSION_DRIVER menjadi 'cookie'
+    // Sesuai perintah, ini adalah metode paling stabil di Vercel
+    $_ENV['SESSION_DRIVER'] = 'cookie';
+    $_SERVER['SESSION_DRIVER'] = 'cookie';
+    putenv('SESSION_DRIVER=cookie');
 
     // PAKSA COOKIE SETTINGS AGAR BROWSER TIDAK MENOLAK SESSION
     $_ENV['SESSION_DOMAIN'] = null;

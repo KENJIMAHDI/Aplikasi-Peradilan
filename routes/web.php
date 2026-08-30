@@ -165,3 +165,8 @@ Route::get('/fix-password', function () {
 
     return 'Password berhasil direset ke standar Bcrypt Laravel!';
 });
+
+Route::get('/clear-cache', function () {
+    Artisan::call('optimize:clear');
+    return 'Cache konfigurasi Vercel berhasil dibersihkan!';
+});
