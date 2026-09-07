@@ -17,14 +17,4 @@ require __DIR__.'/../vendor/autoload.php';
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-echo "<pre>";
-echo "session.driver = " . var_export($app->make('config')->get('session.driver'), true) . "\n";
-echo "app.maintenance.driver = " . var_export($app->make('config')->get('app.maintenance.driver'), true) . "\n";
-echo "hashing.driver = " . var_export($app->make('config')->get('hashing.driver'), true) . "\n";
-echo "cache.default = " . var_export($app->make('config')->get('cache.default'), true) . "\n";
-echo "logging.default = " . var_export($app->make('config')->get('logging.default'), true) . "\n";
-echo "database.default = " . var_export($app->make('config')->get('database.default'), true) . "\n";
-echo "</pre>";
-exit;
-
 $app->handleRequest(Request::capture());
