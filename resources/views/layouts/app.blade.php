@@ -15,11 +15,14 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased font-sans transition-all duration-300" x-data="{ sidebarOpen: true, highContrast: false, textSize: 'normal' }" :class="{ 'bg-black text-white': highContrast, 'text-lg': textSize === 'large', 'text-xl': textSize === 'xlarge' }">
-    <div class="flex h-screen overflow-hidden">
+<body class="bg-gray-50 text-gray-800 antialiased font-sans transition-all duration-300" x-data="{ sidebarOpen: window.innerWidth >= 1024, isMobile: window.innerWidth < 1024, highContrast: false, textSize: 'normal' }" @resize.window="isMobile = window.innerWidth < 1024; if(!isMobile) sidebarOpen = true" :class="{ 'bg-black text-white': highContrast, 'text-lg': textSize === 'large', 'text-xl': textSize === 'xlarge' }">
+    <div class="flex h-screen overflow-hidden relative">
+
+        <!-- Mobile Overlay -->
+        <div x-show="isMobile && sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 lg:hidden" x-transition.opacity style="display: none;"></div>
 
         <!-- Sidebar Kiri -->
-        <aside :class="sidebarOpen ? 'w-72' : 'w-20'" class="bg-emerald-900 text-emerald-100 flex-shrink-0 transition-all duration-300 flex flex-col shadow-2xl z-20">
+        <aside :class="sidebarOpen ? 'translate-x-0 w-72' : '-translate-x-full w-72 lg:translate-x-0 lg:w-20'" class="fixed lg:relative inset-y-0 left-0 z-50 bg-emerald-900 text-emerald-100 transition-all duration-300 flex flex-col shadow-2xl lg:h-screen lg:flex-shrink-0">
             <!-- Header Sidebar -->
             <div class="h-16 flex items-center justify-center bg-emerald-950 border-b border-emerald-800 px-4">
                 <div class="flex items-center gap-3">
