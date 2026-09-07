@@ -97,7 +97,7 @@ class PerdataCRUDTest extends TestCase
     public function test_can_add_perkara_perdata_umum(): void
     {
         $response = $this->actingAs($this->adminUser)
-            ->postJson(route('perdata.store'), [
+            ->postJson(route('perdata-umum.store'), [
                 'nomor_perkara' => '004/Pdt.G/2026/PN.Smg',
                 'tanggal_daftar' => '2026-08-22',
                 'penggugat' => 'Syarifudin',
@@ -123,7 +123,7 @@ class PerdataCRUDTest extends TestCase
     public function test_can_add_perkara_perdata_khusus_without_optional_fields(): void
     {
         $response = $this->actingAs($this->adminUser)
-            ->post(route('perdata.store'), [
+            ->post(route('perdata-khusus.store'), [
                 'nomor_perkara' => '005/Pdt.Sus-PHI/2026/PN.Smg',
                 'jenis_perdata' => 'PHI',
                 'penggugat' => 'Karyawan A',
