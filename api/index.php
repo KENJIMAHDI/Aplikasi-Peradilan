@@ -12,6 +12,17 @@ try {
     // REDIRECT SELURUH STORAGE (LOGS, SESSIONS, CACHE) KE /tmp
     $_ENV['APP_STORAGE_PATH'] = '/tmp/storage';
 
+    // VERCEL seringkali meng-inject environment variable yang kosong ("") 
+    // alih-alih tidak meng-setnya. Hal ini menyebabkan env('DRIVER', 'default') 
+    // mengembalikan "" dan menyebabkan ArgumentCountError di Laravel.
+    // Solusi: Hapus semua variabel lingkungan yang kosong agar Laravel menggunakan default-nya.
+    foreach ($_ENV as $key => $value) {
+        if ($value === '') {
+            unset($_ENV[$key], $_SERVER[$key]);
+            putenv($key); // Menghapus dari getenv()
+        }
+    }
+
     // Buat folder temporary di Vercel agar tidak permission error saat Laravel booting
     $dirs = [
         '/tmp/storage/framework/views',
