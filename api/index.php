@@ -28,9 +28,24 @@ try {
     // Panggil index utama Laravel
     require __DIR__ . '/../public/index.php';
 
+} catch (\ArgumentCountError $e) {
+    http_response_code(500);
+    echo "<h1>ArgumentCountError Debugging</h1>";
+    echo "<p>It seems a config driver is evaluating to an empty string.</p>";
+    $app = require __DIR__.'/../bootstrap/app.php';
+    echo "<pre>";
+    echo "session.driver = " . var_export($app->make('config')->get('session.driver'), true) . "\n";
+    echo "app.maintenance.driver = " . var_export($app->make('config')->get('app.maintenance.driver'), true) . "\n";
+    echo "hashing.driver = " . var_export($app->make('config')->get('hashing.driver'), true) . "\n";
+    echo "cache.default = " . var_export($app->make('config')->get('cache.default'), true) . "\n";
+    echo "logging.default = " . var_export($app->make('config')->get('logging.default'), true) . "\n";
+    echo "database.default = " . var_export($app->make('config')->get('database.default'), true) . "\n";
+    echo "</pre>";
+    echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
 } catch (\Throwable $e) {
     http_response_code(500);
     echo "<h1>Vercel Serverless Error</h1>";
     echo "<p><strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
     echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
 }
+
